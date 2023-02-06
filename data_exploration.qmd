@@ -1,0 +1,382 @@
+---
+title: "Data exploration"
+format: html
+editor: visual
+---
+
+# Airbnb listings - Data exploration
+
+## Read the data:
+
+Read the data and load necessary libraries:
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(ggplot2)
+
+airbnb <- read.csv("airbnb-listings.csv", sep=";", colClasses=c("Scrape.ID"="character"))
+
+summary(airbnb)
+```
+
+#### Cols empty / repeated values
+
+We are going to create a function that tells us how many repeated values are there in each column of the dataframe. This will help us assess the quality of the data:
+
+```{r}
+# cols returns a dataframe that summarizes: the column name, the number of unique values, the empty/false or na values, and the repeated values in each column. 
+
+source("functions.R")
+cols <- function(df){
+  #initialize summary columns
+  nc <- ncol(df)
+  type <- character(nc)
+  unique_values <- integer(nc)
+  nas <- integer(nc)
+  empty <- integer(nc)
+  
+  #save aggregated values:
+  for (i in 1:nc){
+    type[i] <- typeof(df[[i]])
+    unique_values[i] <- length(unique(df[[i]]))
+    if(type[i]=="character"){
+      empty[i] <- sum(nchar(df[[i]], keepNA=F) == 0)
+    }
+    else if(type[i] =="logical"){
+      empty[i] <- sum(!df[[i]])
+    }
+    else{
+      empty[i] <- sum(is.na(df[[i]]))
+    }
+  }
+  #calculate repeated values
+  repeated=nrow(df)-unique_values-empty
+  
+  #return summary df
+  data.frame("column"=colnames(df), unique_values, type, empty, repeated)
+}
+
+airbnb_cols <- cols(airbnb)
+```
+
+We can check that all the listings are uniquely identified by their ID and Geolocation data.
+
+#### Date columns:
+
+Let's assign the correct class to each column. We use as.Date to interpret the date columns:
+
+```{r}
+fechas <- c("Last.Scraped", "Calendar.last.Scraped","First.Review","Last.Review", "Host.Since")
+
+airbnb_clean <- airbnb
+
+#convert date columns: 
+for (element in fechas){
+  airbnb_clean[[element]] <- as.Date(airbnb_clean[[element]])
+}
+```
+
+## Cleaning localization data
+
+#### Longitude and Latitude
+
+Let's paint these points on the map, see what we have:
+
+```{r}
+world <- map_data("world")
+```
+
+```{r}
+world_ab <- airbnb |>
+  ggplot() +
+  geom_polygon(aes(x = long, y = lat, group = group), data=world, fill=NA, colour = "grey") +
+  geom_point(aes(Longitude, Latitude)) +
+  coord_map() +
+  theme_bw()
+
+world_ab
+```
+
+This data is the result of looking for "Madrid" in the source page. Although most of the houses are based in Madrid (around 90% of the total number) , some of them seem to be distributed around the world. Maybe this keyword came up in different textfiedls for spurious reasons. Let's filter the relevant data by Longitude and Latitude:
+
+```{r}
+# zoom the map into Spain... 
+world_ab +
+  xlim(-10,5) +
+  ylim(36,44)
+```
+
+```{r}
+# zoom into Madrid
+world_ab +
+  xlim(-3.9,-3.5) +
+  ylim(40.3,40.6)
+```
+
+```{r}
+airbnb_clean <- airbnb_clean |>
+  filter (Longitude > -3.9 & Longitude < -3.5 & Latitude > 40.3 & Latitude < 40.6 )
+```
+
+#### Country, State, City...
+
+Once we have cleared out the data points outside Madrid's area, it is weird that there are multiple values for Country, Country.Code, State and City. For instance, if we check the listings with a country different to Spain:
+
+```{r}
+detail <- airbnb_clean[airbnb_clean$Country!="Spain", ]
+```
+
+We can check that most of the information about the apartment in "Cuba" talks about La Habana. The geolocation might be wrong, so we cant probably trust this data point. The listing from Italy seems to be an italian girl looking for an apartment.
+
+\``{r} detail <- airbnb_clean |>   filter(!(grepl("Madrid|马德里|馬德里自治區", City, ignore.case = TRUE) | grepl("28...", Zipcode)))`
+
+Something similar happens if we check the apartments that don't mention Madrid as the State, and have a Zipcode that doesn't start with 28. Some apartments have addresses located in Barcelona, Malaga or Valencia, 4 of them don't have any information about their city, Street State or Zipcode. These could be mistakes in the Geolocation data. They only add up to 11 data points, so we can safely remove them.
+
+```{r}
+airbnb_clean <- airbnb_clean |>
+  filter(grepl("Madrid|马德里|馬德里自治區", City, ignore.case = TRUE) | grepl("28...", Zipcode))
+```
+
+Finally, we are going to remove 5 extra outliers, that seem to be located outside the area of Madrid city:
+
+```{r}
+airbnb_clean <- airbnb_clean |>
+  filter (Neighbourhood.Cleansed!="El Pardo" & City!="San Fernando de Henares" & City != "Boadilla del Monte" & Zipcode != "28224")
+```
+
+Now we can standardize these columns and take another look at the columns summary:
+
+```{r}
+airbnb_clean$City <- "Madrid"
+airbnb_clean$State <- "Comunidad de Madrid"
+
+airbnb_cols <- cols(airbnb_clean)
+```
+
+####Neighbourhood There seems to be a difference between Neighbourhood and Neighbouhood.Cleansed. Let's visualize that:
+
+```{r}
+madrid_ab <- airbnb_clean |>
+  ggplot() +
+  coord_map() +
+  theme_bw() +
+  theme(legend.position = "none")
+  
+madrid_nh <- madrid_ab +
+  geom_point(aes(Longitude, Latitude, color=Neighbourhood))
+
+madrid_nhc <- madrid_ab +
+  geom_point(aes(Longitude, Latitude, color=Neighbourhood.Cleansed))
+
+gridExtra::grid.arrange(madrid_nh, madrid_nhc, ncol=2)  
+
+```
+
+It seems that Neighbourhood.Cleansed correlates better with the Geolocalitation data for each house. According to the Data Dictionary, this field was double checked using Latitude and Longitude data. Neighbourhood also has more empty values. We will use Neighbourhood.Cleansed from now on.
+
+```{r}
+airbnb_clean <- airbnb_clean |>
+  select(-"Neighbourhood")
+```
+
+#### Empty price:
+
+Since price is one of the key metrics we will try to predict, we can't possibly use the apartments that don't have this value (these are only 9 data points).
+
+```{r}
+detail <- airbnb_clean[is.na(airbnb_clean$Price),]
+
+airbnb_clean <- airbnb_clean |>
+  filter(!is.na(airbnb_clean$Price))
+```
+
+## Text processing
+
+We want to clean some of the character fields and transform the lists into separated columns:
+
+#### ZipCode:
+
+Let's edit and remove incorrect Zipcodes.
+
+```{r}
+#unique(airbnb_clean$Zipcode)
+
+airbnb_clean <- airbnb_clean |>
+  mutate(Zipcode = gsub('Madrid ', '', Zipcode)) |>
+  mutate(Zipcode = gsub('.+\n', '', Zipcode)) |>
+  mutate(Zipcode = ifelse(grepl("28...", Zipcode), Zipcode, ""))
+
+unique(airbnb_clean$Zipcode)
+```
+
+#### Street:
+
+Some streets are in English, others in Spanish... we already have the zip code in a different field. And all the data belongs to Madrid. Let's align these fields and isolate the Street name.
+
+```{r}
+#sort(unique(airbnb_clean$Street))
+```
+
+```{r}
+airbnb_clean <- airbnb_clean |>
+  mutate(Street = gsub(',.+', '', Street)) |>
+  mutate(Street = ifelse(grepl("madri|马德里|馬德里", Street, ignore.case=TRUE), "", Street)) |>
+  mutate(Street = gsub('el Pardo', 'El Pardo', Street))
+
+sort(unique(airbnb_clean$Street))
+```
+
+#### Ammenities, Features.
+
+These columns contain a string that summarizes different properties of the house or the host. We want to turn each property into a different column with a boolean value (T/F). Let's create a function (split_column) that does that:
+
+```{r}
+split_column <- function(df, column){
+  #we want to save all the different properties that can be found in the column. 
+  properties <- df[[column]] |>
+    strsplit(",") |>
+    unlist() |>
+    unique()
+
+  #for each property (pr) of the properties vector, we create a new column (df[pr]):
+  for (pr in properties){
+  df[[pr]] <- grepl(pr, df[[column]])
+  }
+  df
+}
+
+airbnb_clean <- split_column(airbnb_clean, "Amenities")
+airbnb_clean <- split_column(airbnb_clean, "Features")
+
+airbnb_clean <-airbnb_clean |>
+  select(-Amenities, -Features)
+```
+
+This has added more than 50 logical columns to our dataframe. Most are almost empty and therefore, not very useful, but we will remove them in time.
+
+#### Factors:
+
+Now, we want to identify what character columns could be interpreted as factors (categorical qualitative variables). Let's take a look again at the columns summary.
+
+```{r}
+airbnb_cols <- cols(airbnb_clean)
+airbnb_cols[order(airbnb_cols$repeated, decreasing=TRUE), ]
+```
+
+Now, we can convert categorical columns to factor
+
+```{r}
+#convert character columns into factors: 
+for (i in 1:nrow(airbnb_cols)){
+  if (airbnb_cols$type[i] == "character" & airbnb_cols$repeated[i] > 6000){
+    nombre <- airbnb_cols$column[i]
+    airbnb_clean[[nombre]] <-  factor(airbnb_clean[[nombre]], exclude="")
+  }
+}
+```
+
+## Columns that we could remove:
+
+Lets check: airbnb_cols to filter out some initial columns:
+
+```{r}
+airbnb_cols <- cols(airbnb_clean)
+```
+
+-   Scrape.ID, Last.Scraped, City, State, Country, Country.Code: All houses share the same value, so these are almost metadata, nor very useful as variables.
+
+-   Calendar.last.Scraped: there are only 2 different dates, separated by a day (the date is the same as the Last.Scraped date)
+
+-   Experiences.Offered, Host.Acceptance.Rate, Jurisdiction.Names, Has.Availability: all values are "none".
+
+-   Square.Feet: this is an interesting value to predict price. But it is mostly empty in Madrid listings (probably bc it is in feet).
+
+-   License: mostly empty
+
+-   Listing.Url, Host.Url: probably redundant with the listing and host ID
+
+-   Thumbnail.Url, Medium.Url, Picture.Url, XL.Picture.Url, Host.Thumbnail.Url, Host.Picture.Url: we won't be doing image analysis this time.
+
+-   Host.Total.Listings.Count, Calculated.host.listings.count: These fields are very similar to Host.Listings.Count. Calculated is very inferior only in 12% of the cases. Total is identical.
+
+-   Host.Neighbourhood: very similar to Host.Location, but Neighbourhood has more empty values and it lacks definition in the Data dictionary.
+
+-   Market, Smart.Location: seem a bit redundant with other location data. They are not described in the dictionary, and they were removed from the latest scrapes.
+
+-   Geolocation: redundant with longitud + latitude.
+
+-   Features/amenities: There are many interesting features in these fields. But some of them are only included in less than 10% of the listings. We believe these might be less relevant for our analysis.
+
+```{r}
+airbnb_clean <- airbnb_clean
+
+for (i in 1:nrow(airbnb_cols)){
+  #eliminamos columnas con un único valor
+  if (airbnb_cols$unique_values[i] < 2 | airbnb_cols$empty[i] > 11987){
+    nombre <- airbnb_cols$column[i]
+    airbnb_clean[[nombre]]<-NULL
+  }
+}
+airbnb_clean <- airbnb_clean |>
+  select(-contains("Url")) |>
+  select(-contains("translation missing")) |>
+  select(-Host.Neighbourhood, -Host.Total.Listings.Count, -Calculated.host.listings.count, -Geolocation, -Market, -Smart.Location, -Calendar.last.Scraped)
+
+```
+
+```{r}
+airbnb_cols <- cols(airbnb_clean)
+
+write.csv(airbnb_clean, "airbnb_clean.csv", sep = ";", row.names = FALSE)
+```
+
+## Data entities:
+
+The columns unique values can tell us a lot about about the entities on this table and how they relate: - For instance -\> there are 14780 listings, but only 8935 Hosts. This means that one Host can have multiple houses to rent in airbnb. Let's create table for different entities:
+
+#### Hosts table:
+
+```{r}
+hosts <- airbnb_clean |>
+  select(contains("Host")) |>
+  unique()
+
+hosts_cols <- cols(hosts)
+
+write_csv(hosts, "hosts.csv")
+
+```
+
+There are 8173 unique Hosts. Some of them offer multiple houses in Madrid.
+
+## What could we learn?
+
+Let's look into the columns and see what we could learn from them. This way we can then remove columns that are probably not too relevant for our analysis.
+
+For a detailed description of each data column we can access the [Data Dictionary](https://docs.google.com/spreadsheets/d/1iWCNJcSutYqpULSQHlNyGInUvHg2BoUGoNRIGa6Szc4/edit#gid=1322284596 "Inside AirBnb") available at [InsideAirbnb.com](http://insideairbnb.com/).
+
+#### Basic data:
+
+-   ID, Host.ID: These IDs will help us tell houses and hosts apart
+-   Latitude, Longitude, Street, Neighbourhood.Cleansed, Neighbourhood.Group.Cleansed, Zipcode are relevant to represent the dataset and can also be used as variables.
+
+#### Key metrics:
+
+-   **Price** (Price, Weekly.Price, Monthly.Price, Security.Deposit, Cleaning.Fee): these are values we could try to predict. Most of them have lots of empty values except for "Price".
+-   **Availability** (Availability.30, Availability.60, Availability.90, Availability.365, Calendar.Updated?): could be interesting, as low availability is usually indicative of high demand.
+-   **Ratings** (Review.Scores.Rating): This could also be indicative of high demand.
+
+#### Possible data stories:
+
+-   **Do words increase your airbnb price?** Name (char), Summary, Space, Description, Neighborhood.Overview, Notes, Transit, Access, Interaction, House.Rules. These are all char fields. They could allow us to compare some linguistic features with the house price or availability. For instance: are houses described in English more expensive than those described in Spanish? Do lengthy descriptions correlate with higher prices...
+
+-   **Does gender affect pricing in airbnb?** Host.Name: gender analysis. are male hosts setting prices higher than female hosts or viceversa? Do their houses have higher demand?
+
+-   **The key to success as an airbnb Host**: Host.Since, Host.Location, Host.About, Host.Response.Time, Host.Response.Rate, Host.Listings.Count, Host.Verifications, Features. We could look for the host characteristics and behaviours that drive higher demand/ratings. Are more experienced hosts setting prices higher than new-comers or viceversa? Having a Host description is relevant for the price?
+
+-   **The most wanted in airbnb**: Property.Type, Room.Type, Bed.Type, Bathrooms, Bedrooms, Beds, Accommodates, Amenities, Guests.Included, Extra.People, Minimum.Nights, Maximum.Nights, Cancellation.Policy, Features. We can look for the property characteristics that drive high demand, better reviews and/or higher price.
+
+-   **Do perks increase your airbnb price?** Beyond location and price. Are there other perks and characteristics that impact price the most?
+
+-   **The value of social proof**: Number.of.Reviews, First.Review, Last.Review, Review.Scores.Rating, Review.Scores.Accuracy, Review.Scores.Cleanliness, Review.Scores.Checkin, Review.Scores.Communication, Review.Scores.Location, Review.Scores.Value, Reviews.per.Month. How much do these values impact price (once other variables have been accounted for).
