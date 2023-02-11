@@ -13,29 +13,33 @@ The tools used to carry out this project are the following:
 * [Draw.io](https://app.diagrams.net/) ~> To model the database by constructing the Entity-Relationship Diagram
 * [PostgreeSQL](https://www.postgresql.org/) ~> As database engine
 * [DBeaver](https://dbeaver.io/) ~> A generic client to access all kinds of databases, in this case postgreSQL
-* [Python] ~>
-* [RStudio] ~>
-* [Tableau]
-* [Git] ~> To share this project
+* [Python](https://www.python.org/) ~> An interpreted, object-oriented, high-level programming language
+* [RStudio](https://posit.co/) ~> An integrated development environment for R, a programming language for statistical computing and graphics 
+* [Tableau](https://www.tableau.com/)~> A visual analytics platform.
+* [Git](https://git-scm.com/) ~> To share this project
+
+
+## Project resources
+
+You can see the initial information used for this analysis in the following Airbnb dataset: [airbnb-listings.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/airbnb-listings.csv)
 
 
 ## Project methodology
 
-* First of all, an initial exploration and cleaning of the data provided in the following dataset will be done: [airbnb-listings.csv].
+* First of all, an initial exploration and cleaning of the data provided in the initial dataset was done.
 
-* Next, a statistical study will be done in order to normalize data, detect outliers and ensure the quality of the data.
+* Next, a statistical study was done in order to normalize data, detect outliers and ensure the quality of the data.
 
-* A dashboard will be created to visualize the relevant kpis and show the conclusions to respond the topic that we are evaluating
+* After that, a dashboard was created to visualize the relevant KPIs and to show the conclusions in order to respond the topic we wanted to evaluate.
 
-* The next step is to code a linear regression algorithm will in order to predict the price of a
-property based on the most influential characteristics to the success of the accommodation
+* The next step was to code a linear regression algorithm will in order to predict the price of a property based on the most influential characteristics to the success of the accommodation
 
-* Finally, a conclusion to this study will be shown
+* Finally, an answer to our question was deduced from the analysis we had carried out.
 
 
 ## Initial exploration and cleansing of data
 
-After reading the data and loading necessary libraries, we created a function that tells us how many repeated values are there in each column of the dataframe in order to assess the quality of the data. 
+After reading the initial dataset and loading necessary libraries, we created a function that tells us how many repeated values are there in each column of the dataframe in order to assess the quality of the data. 
 
 We also assigned the correct class to each column by using as.Date to interpret the date columns.
 
@@ -105,12 +109,13 @@ Finally, after observing and cleaning the initial dataframe, we removed the foll
 
 * Features/amenities: There are many interesting features in these fields. But some of them are only included in less than 10% of the listings. We believe these might be less relevant for our analysis.
 
-### You can see this all in the following file: [nombre del archivo](Enlace al archivo)
+### You can see this all in the following file: [airbnb_ready.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/data_exploration.qmd)
 
 
 ## Statistical study
 
-### Python Ekaterina
+
+### You can see this all in the following file: [eda_with_python.ipynb](hhttps://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/eda_with_python.ipynb)
 
 
 ## Data visualization
@@ -145,7 +150,7 @@ Finally, after observing and cleaning the initial dataframe, we removed the foll
 
 * **Ana González Esteban** - *Autor del proyecto*  - [Linkedin](https://www.linkedin.com/in/anagonzalezesteban/) - [Github](https://github.com/AnaGonzalezEsteban)
 
-
+--------------------------------
 ## Agradecimientos
 
 * **KeepCoding** - *Centro de formación* - [Web de KeepCoding](https://keepcoding.io/)
