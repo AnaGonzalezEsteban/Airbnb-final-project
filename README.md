@@ -1,12 +1,38 @@
 # The key to the success of an airbnb listing
 
+0. Project index
 
-## Project object
+1. Project object
+
+2. Project software
+
+3. Project resources
+
+4. Project methodology
+
+5. Definition and implementation of the datawarehouse
+
+6. Initial exploration and cleansing of data
+
+7. Statistical study
+
+8. Data visualization
+
+9. Linear regresion algorithm
+
+10. Conclusion
+
+11. Project editors
+
+12. Thanks to
+
+
+## 1. Project object
 
 The purpose of this project is to analyze which features an airbnb accommodation must have to be one of the most rented in Madrid.
 
 
-## Project software
+## 2. Project software
 
 The tools used to carry out this project are the following:
 
@@ -19,14 +45,14 @@ The tools used to carry out this project are the following:
 * [Git](https://git-scm.com/) ~> To share this project
 
 
-## Project resources
+## 3. Project resources
 
 ### You can see the initial information used for this analysis in the following Airbnb dataset: [airbnb-listings.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/airbnb-listings.csv)
 
 ### Also we used the information we found in the website that provides the initial dataset about its content in this file: [Inside Airbnb Data Dictionary.xlsx](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Inside%20Airbnb%20Data%20Dictionary.xlsx) 
 
 
-## Project methodology
+## 4. Project methodology
 
 * First of all, we analysed the initial Airbnb's dataset and created an Entity-Relationship Diagram of our datawarehouse and we coded a SQL script to create it.
 
@@ -41,7 +67,7 @@ The tools used to carry out this project are the following:
 * Finally, an answer to our question was deduced from the analysis we had carried out.
 
 
-## Definition and implementation of the datawarehouse
+## 5. Definition and implementation of the datawarehouse
 
 The following image shows the E-R diagram of our datawarehouse:
 
@@ -50,7 +76,7 @@ The following image shows the E-R diagram of our datawarehouse:
 ### You will see the SQL script to  our datawarehouse in this link: [ScriptSQL.sql](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/ScriptSQL.sql)
 
 
-## Initial exploration and cleansing of data
+## 6. Initial exploration and cleansing of data
 
 After reading the initial dataset and loading necessary libraries, we created a function that tells us how many repeated values are there in each column of the dataframe in order to assess the quality of the data. 
 
@@ -125,7 +151,7 @@ Finally, after observing and cleaning the initial dataframe, we removed the foll
 ### You can see the code in the following file: [airbnb_ready.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/data_exploration.qmd)
 
 
-## Statistical study
+## 7. Statistical study
 
 ### Columns with null values:
 
@@ -193,7 +219,7 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 ### You can see the code in the following file: [eda_with_python.ipynb](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/eda_with_python.ipynb)
 
 
-## Data visualization
+## 8. Data visualization
 
 ![DashboardTableau]()
 
@@ -201,17 +227,17 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 ### You can see the complete visualization file here:
 
 
-## Linear regresion algorithm
+## 9. Linear regresion algorithm
 
 ### Ekaterina
 
 
-## Conclusion
+## 10. Conclusion
 
 ### Ana
 
 
-## Project editors
+## 11. Project editors
 
 * **Almudena Martin Castro** - *Autor del proyecto* - [Linkedin](https://www.linkedin.com/in/almudenamcastro/) - [Github](https://github.com/almudenamcastro)
 
@@ -224,7 +250,7 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 * **Ana González Esteban** - *Autor del proyecto*  - [Linkedin](https://www.linkedin.com/in/anagonzalezesteban/) - [Github](https://github.com/AnaGonzalezEsteban)
 
 --------------------------------
-## Agradecimientos
+## 12. Thanks to
 
 * **KeepCoding** - *Centro de formación* - [Web de KeepCoding](https://keepcoding.io/)
 *  **Glovo** - *Patrocinador* - [Web de Glovo](https://glovoapp.com/)
