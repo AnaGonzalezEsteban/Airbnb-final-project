@@ -1,4 +1,4 @@
-# The key to the success of an airbnb listingº
+# The key to the success of an airbnb listing
 
 
 ## Project object
@@ -21,12 +21,16 @@ The tools used to carry out this project are the following:
 
 ## Project resources
 
-You can see the initial information used for this analysis in the following Airbnb dataset: [airbnb-listings.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/airbnb-listings.csv)
+### You can see the initial information used for this analysis in the following Airbnb dataset: [airbnb-listings.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/airbnb-listings.csv)
+
+### Also we used the information we found in the website that provides the initial dataset about its content in this file: [Inside Airbnb Data Dictionary.xlsx](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Inside%20Airbnb%20Data%20Dictionary.xlsx) 
 
 
 ## Project methodology
 
-* First of all, an initial exploration and cleaning of the data provided in the initial dataset was done.
+* First of all, we analysed the initial Airbnb's dataset and created an Entity-Relationship Diagram of our datawarehouse and we coded a SQL script to create it.
+
+* Then, an initial exploration and cleaning of the data provided in the initial dataset was done.
 
 * Next, a statistical study was done in order to normalize data, detect outliers and ensure the quality of the data.
 
@@ -35,6 +39,15 @@ You can see the initial information used for this analysis in the following Airb
 * The next step was to code a linear regression algorithm will in order to predict the price of a property based on the most influential characteristics to the success of the accommodation
 
 * Finally, an answer to our question was deduced from the analysis we had carried out.
+
+
+## Definition and implementation of the datawarehouse
+
+The following image shows the E-R diagram of our datawarehouse:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/E-R%20Diagram.png)
+
+### You will see the SQL script to  our datawarehouse in this link: [ScriptSQL.sql](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/ScriptSQL.sql)
 
 
 ## Initial exploration and cleansing of data
@@ -191,11 +204,6 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 ## Linear regresion algorithm
 
 ### Ekaterina
-
-
-## Definition and implementation of the Datawarehouse
-
-### SQL Vicky
 
 
 ## Conclusion
