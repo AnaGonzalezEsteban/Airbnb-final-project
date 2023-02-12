@@ -177,7 +177,7 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 ![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/PyGraph13.PNG)
 ![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/PyGraph14.PNG)
 
-### You can see the code in the following file: [eda_with_python.ipynb](hhttps://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/eda_with_python.ipynb)
+### You can see the code in the following file: [eda_with_python.ipynb](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/eda_with_python.ipynb)
 
 
 ## Data visualization
