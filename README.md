@@ -1,7 +1,5 @@
 # The key to the success of an airbnb listing
 
-0. Project index
-
 1. Project object
 
 2. Project software
