@@ -219,4 +219,4 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 ## Agradecimientos
 
 * **KeepCoding** - *Centro de formación* - [Web de KeepCoding](https://keepcoding.io/)
-*  **Glovo** - *Patrocinador* - [Web de Glovo]((https://glovoapp.com/))
+*  **Glovo** - *Patrocinador* - [Web de Glovo](https://glovoapp.com/)
