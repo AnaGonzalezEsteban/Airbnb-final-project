@@ -221,15 +221,95 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 
 ## 8. Data visualization
 
-![DashboardTableau]()
+![DashboardTableau](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Proyecto%20Tableau.twb)
 
-### Explanation of the dashboard
-### You can see the complete visualization file here:
+### You can see the complete visualization file here: [DashboardTableau](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Proyecto%20Tableau.twb)
 
 
 ## 9. Linear regresion algorithm
 
-### Ekaterina
+The objective of this part of the project was to make a linear regression algorithm that predicts the price of a property depending on the characteristics we chose.
+
+The price has the following distribution:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion1)
+
+Price's distribution had some serious outliers, but given the nature of the dataset, a lot of these could be real observations. That's why we decided to have a look at the percentiles:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion2)
+
+After droping columns that were not likely to be of interest for a linear regression model predicting price or these ones which had too many nulls as per previous EDA in python, we imputed the null values in the float dtype columns that weren't imputed before visualization in order to avoid distorting the analysis.
+
+There weren't any null values left in Bathrooms column, but having 0 values for number of bathrooms was weird, so we checked if it was related with Room.Type and Price and might actually mean 0.5 bathrooms (a small bathroom without shower or tub):
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion3)
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion4)
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion5)
+
+These 0 values didn't seem to depend on the Room.Type and in terms of price were similar to 0.5 bathroom listings, so we imputed them with 0.5.
+
+There were no null values left and 0 Bedrooms could mean a studio:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion6)
+
+In case of reviews, null values most likely corresponded to properties with no reviews so far.
+Speaking about Review.Score, it was difficult to impute missing reviews without distorting the data, so we just dropped these observations.
+Madrid Based Values in Madrid.Based column were not exactly null, so the label was just adjusted to 'No Data', 'False' and 'True.
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion7)
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion8)
+
+While checking the association of different features of this dataset with the price, there were about 90 features, so explored them by thematic groups.
+
+In the following group we could seee that longitude and Latitude didn't have very significant correlation with the Price, but they could be informative.
+Neighbourhood.Cleansed and Neighbourhood.Group.Cleansed were rather similar and one should be dropped in order to avoid using highly correlated independent variables:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion9)
+
+The correlation of Review Scores with Price was not very high but they still could be informative for the model:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion10)
+
+Type of property and its general characteristics except Listing.Description.Length were tightly associated with the price:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion11)
+
+The following features seemed to be important:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion12)
+
+Except for the Internet and Buzzer.wireless.intercom, amenities columns also seemed to be relevant:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion13)
+
+Except for Breakfast, Washer, Family.kid.friendly, Dryer, Hair.dryer and Iron, the following amenities could be important:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion14)
+
+Except for Laptop.friendly.workspace, Fire.extinguisher, Smoke.detector, Carbon.monoxide.detector and X24.hour.check.in, these amenities also seemed to be important:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion15)
+
+Features with interesting correlation with the price seemed to be Host.Listings.Count, Host.Identity.Verified, Host.Tenure, Host.Is.Superhost, Host.Response.Time, Days.from.Cal.Update, N.of.Host.Verifications:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion16)
+
+After the previous estadistic analysis,  we determined that the features to include in our regresion algorithm to predict the price were the following:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion17.PNG)
+
+After creating the linear regresion model, the RMSE and Rsquared were similar for train and test, meaning that the model was not under- or overfitting. However, the performance was far from optimal, so we checked the residual errors:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion18)
+
+The model failed most with Price range outliers. Probably, by better managing the outliers, we could have obtained a better result:
+
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion19)
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion20)
+
+Then we were ready to try a new model.This definitive model obteined RMSE and Rsquared values better than before trimming the upper outliers. Both values were similar for train and test, meaning that the model was not under- or overfitting.
+
+### You will find the linear regresion file here: [R_linear_regression.qmd](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/R_linear_regression.qmd)
 
 
 ## 10. Conclusion
