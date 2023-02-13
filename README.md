@@ -308,16 +308,20 @@ After the previous estadistic analysis,  we determined that the features to incl
 
 ![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion17.PNG)
 
-After creating the linear regresion model, the RMSE and Rsquared were similar for train and test, meaning that the model was not under- or overfitting. However, the performance was far from optimal, so we checked the residual errors:
+After creating the linear regresion model, With R-squared of 0.64 and 30 as residual standard error, the performance was far from optimal, so we checked the residual errors:
 
 ![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion18)
 
-The model failed most with Price range outliers. Probably, by better managing the outliers, we could have obtained a better result:
+The residual errors tended to get bigger with higher values. One possible cause of poor performance of the model could be the skewness of the data that we had observed earlier.
 
-![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion19)
-![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Regresion20)
+In order to amend the skeweness of the data, we made the following logarithmic and square root transformations:
+* Log of Price instead of Price
+* Log of Number of Reviews instead of Number of Reviews
+* log(x+1) for Security Deposit and Cleaning Fee because they have 0 values after imputation
+* Square root for medium-performing Reviews.Score variables
+* Drop features with feeble correlation
 
-Then we were ready to try a new model.This definitive model obteined RMSE and Rsquared values better than before trimming the upper outliers. Both values were similar for train and test, meaning that the model was not under- or overfitting.
+After these changes, the Rsquared for both train and test subsets were around 0.77-0.78, which we consider acceptable values. The fact that they were similar showed that this model wasn't overfitting.
 
 ### You will find the linear regresion file here: [R_linear_regression.qmd](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/R_linear_regression.qmd)
 
