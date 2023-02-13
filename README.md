@@ -69,9 +69,11 @@ The tools used to carry out this project are the following:
 
 The following image shows the E-R diagram of our datawarehouse:
 
-![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/E-R%20Diagram.png)
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Diagrama%20E-R.drawio.png)
 
-### You will see the SQL script to  our datawarehouse in this link: [ScriptSQL.sql](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/ScriptSQL.sql)
+### You will see the E-R Diagram file here: [Diagrama E-R.drawio](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Diagrama%20E-R.drawio)
+
+### You will see the SQL script to  our datawarehouse in this link: [script_project.sql](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/script_project.sql)
 
 
 ## 6. Initial exploration and cleansing of data
