@@ -25,11 +25,13 @@
 12. Thanks to
 
 
+--------------------------------
 ## 1. Project object
 
 The purpose of this project is to analyze which features an airbnb accommodation must have to be one of the most rented in Madrid.
 
 
+--------------------------------
 ## 2. Project software
 
 The tools used to carry out this project are the following:
@@ -43,6 +45,7 @@ The tools used to carry out this project are the following:
 * [Git](https://git-scm.com/) ~> To share this project
 
 
+--------------------------------
 ## 3. Project resources
 
 ### You can see the initial information used for this analysis in the following Airbnb dataset: [airbnb-listings.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/airbnb-listings.csv)
@@ -50,6 +53,7 @@ The tools used to carry out this project are the following:
 ### Also we used the information we found in the website that provides the initial dataset about its content in this file: [Inside Airbnb Data Dictionary.xlsx](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Inside%20Airbnb%20Data%20Dictionary.xlsx) 
 
 
+--------------------------------
 ## 4. Project methodology
 
 * First of all, we analysed the initial Airbnb's dataset and created an Entity-Relationship Diagram of our datawarehouse and we coded a SQL script to create it.
@@ -65,6 +69,7 @@ The tools used to carry out this project are the following:
 * Finally, an answer to our question was deduced from the analysis we had carried out.
 
 
+--------------------------------
 ## 5. Definition and implementation of the datawarehouse
 
 The following image shows the E-R diagram of our datawarehouse:
@@ -76,6 +81,7 @@ The following image shows the E-R diagram of our datawarehouse:
 ### You will see the SQL script to  our datawarehouse in this link: [script_project.sql](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/script_project.sql)
 
 
+--------------------------------
 ## 6. Initial exploration and cleansing of data
 
 After reading the initial dataset and loading necessary libraries, we created a function that tells us how many repeated values are there in each column of the dataframe in order to assess the quality of the data. 
@@ -151,6 +157,7 @@ Finally, after observing and cleaning the initial dataframe, we removed the foll
 ### You can see the code in the following file: [airbnb_ready.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/data_exploration.qmd)
 
 
+--------------------------------
 ## 7. Statistical study
 
 ### Columns with null values:
@@ -219,13 +226,16 @@ Most hosts were not willing to limit maximum booking time. However, the maximum 
 ### You can see the code in the following file: [eda_with_python.ipynb](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/eda_with_python.ipynb)
 
 
+--------------------------------
 ## 8. Data visualization
 
-![DashboardTableau](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Proyecto%20Tableau.twb)
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Dashboard%202.png)
+![image text](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/images/Dashboard%203.png)
 
 ### You can see the complete visualization file here: [DashboardTableau](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Proyecto%20Tableau.twb)
 
 
+--------------------------------
 ## 9. Linear regresion algorithm
 
 The objective of this part of the project was to make a linear regression algorithm that predicts the price of a property depending on the characteristics we chose.
@@ -312,25 +322,30 @@ Then we were ready to try a new model.This definitive model obteined RMSE and Rs
 ### You will find the linear regresion file here: [R_linear_regression.qmd](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/R_linear_regression.qmd)
 
 
+--------------------------------
 ## 10. Conclusion
 
-### Ana
+● Suposiciones iniciales. Cuales han demostrado ser válidas y cuáles no. ¿Por qué?
+● Métricas seleccionadas: ¿han sido las correctas o no? ¿por qué?
+● Teniendo en cuenta lo aprendido ¿Qué cosas se harían igual y cuales se harían de otra forma? ¿Por qué?
+● Conclusiones y “lessons learned”
 
 
+--------------------------------
 ## 11. Project editors
 
 * **Almudena Martin Castro** - *Autor del proyecto* - [Linkedin](https://www.linkedin.com/in/almudenamcastro/) - [Github](https://github.com/almudenamcastro)
 
 * **Ekaterina Eremina** - *Autor del proyecto* - [Linkedin](https://www.linkedin.com/in/ekaterina-eremina/) - [Github](https://github.com/ekaterinaleks)
 
-* **Maria Victoria García Gómez** - *Autor del proyecto* - [Linkedin](https://www.linkedin.com/in/mar%C3%ADa-victoria-garc%C3%ADa-g%C3%B3mez-34b689254/) - [Github]()
+* **Maria Victoria García Gómez** - *Autor del proyecto* - [Linkedin](https://www.linkedin.com/in/mar%C3%ADa-victoria-garc%C3%ADa-g%C3%B3mez-34b689254/) - [Github](https://github.com/ggmvic)
 
-* **Elisabet Soriano** - *Autor del proyecto* - [Linkedin](https://www.linkedin.com/in/elisabet-soriano-845542175/) - [Github]()
+* **Elisabet Soriano** - *Autor del proyecto* - [Linkedin](https://www.linkedin.com/in/elisabet-soriano-845542175/)
 
 * **Ana González Esteban** - *Autor del proyecto*  - [Linkedin](https://www.linkedin.com/in/anagonzalezesteban/) - [Github](https://github.com/AnaGonzalezEsteban)
 
 --------------------------------
-## 12. Thanks to
+## 12. Thanks
 
 * **KeepCoding** - *Centro de formación* - [Web de KeepCoding](https://keepcoding.io/)
 *  **Glovo** - *Patrocinador* - [Web de Glovo](https://glovoapp.com/)
