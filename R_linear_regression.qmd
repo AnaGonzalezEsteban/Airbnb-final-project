@@ -19,32 +19,16 @@ head(df_airbnb)
 names(df_airbnb)
 ```
 
-Let's have a look at the distribution of the target variable.
+Let's have a look at the **distribution of the target variable**.
 
 ```{r, fig.width=10, fig.height=5}
 library(ggplot2)
 ggplot(df_airbnb, aes(x=Price)) + geom_boxplot(color='#13b99a')
 ```
 
-There are some serious outliers in this column, but given the nature of the dataset a lot of these can be real observations. Let's have a look at the percentiles.
+There are some serious outliers in this column, but given the nature of the dataset and a relatively high number of these outliers, these can be real observations, a lot of these can be real observations.
 
-```{r}
-quantile(df_airbnb$Price,c(0, 0.25, 0.5, 0.75, 0.9, 0.95, 0.98, 0.995, 1))
-
-```
-
-It should be enough to just trim the last 0.5 percentile instead of applying the iqr\*1,5 approach.
-
-```{r}
-df_airbnb |>
-  mutate(Price=ifelse(Price>410, 410, Price)) -> df_short
-```
-
-```{r}
-ggplot(df_short, aes(x=Price)) + geom_boxplot(color=	'#275136')
-```
-
-First, let's drop columns that are not likely to be of interest for a linear regression model predicting price or that have too many nulls as per previous EDA in python
+First, let's **drop columns** that are not likely to be of interest for a linear regression model predicting price or that have too many nulls as per previous EDA in python
 
 ```{r}
 #drop columns and save the result in df_short
@@ -53,7 +37,7 @@ df_airbnb |> select(-c(X, ID, Name, Zipcode, Weekly.Price, Monthly.Price, Host.N
 
 ```
 
-The next step would be to impute the null values in the float dtype columns Bathrooms, Bedrooms, Beds, Review.Scores.Rating, Review.Scores.Accuracy, Review.Scores.Cleanliness, Review.Scores.Checkin, Review.Scores.Communication, Review.Scores.Location, Review.Scores.Value, Reviews.per.Month and boolean column Madrid.Based that weren't imputed before visualization in order avoid distorting the analysis.
+The next step would be to **impute the null values** in the float dtype columns Bathrooms, Bedrooms, Beds, Review.Scores.Rating, Review.Scores.Accuracy, Review.Scores.Cleanliness, Review.Scores.Checkin, Review.Scores.Communication, Review.Scores.Location, Review.Scores.Value, Reviews.per.Month and boolean column Madrid.Based **that weren't imputed before visualization in order avoid distorting the analysis.**
 
 **Bathrooms**
 
@@ -124,7 +108,7 @@ any(is.na(df_short$Reviews.per.Month))
 Speaking about Review.Score, it is difficult to impute missing reviews without distorting the data, so I will just drop these observations.
 
 ```{r}
-#impute null values with min
+#drop observations with nulls in Review data
 df_short |> drop_na() -> df_short
 ```
 
@@ -150,9 +134,9 @@ df_short$Madrid.Based <- factor(df_short$Madrid.Based, labels = c('No Data', 'Fa
 ggplot(df_short, aes(x=Madrid.Based, fill=Madrid.Based)) + geom_bar()
 ```
 
-Let's check the association of different features of this dataset with the price.
+Let's **check the association of different features of this dataset with the price.**
 
-Given that there are about 90 features, we will explore them by thematic groups.
+Given that there are about 90 features, we will explore them *by thematic groups.*
 
 **Location**
 
@@ -163,7 +147,7 @@ ggpairs(df_short[,c('Price', 'Latitude', 'Longitude', 'Neighbourhood.Group.Clean
 )  
 ```
 
-Longitude and Latitude don't have very significant correlation with the Price and but can be informative. Neighbourhood.Cleansed and Neighbourhood.Group.Cleansed are rather similar and one should be dropped in order to avoid using highly correlated independent variables.
+Longitude and Latitude don't have very significant correlation with the Price and but can be informative. Neighbourhood.Cleansed and Neighbourhood.Group.Cleansed are rather similar and one should be dropped in order to **avoid using highly correlated independent variables.**
 
 ```{r}
 df_short |> select(-c(Neighbourhood.Cleansed)) -> df_short
@@ -197,7 +181,7 @@ ggpairs(df_reviews,cardinality_threshold =22, progress=F, lower = list(continuou
 
 ```
 
-The correlation of Review Scores with Price is not very high but they still could be informative for the model.
+The correlation of Review Scores with Price is not very high but they still could be informative for the model. However, it might be useful to keep in mind that **the distribution of all these variables is left skewed**.
 
 **Type of property and its general characteristics**
 
@@ -208,10 +192,10 @@ ggpairs(drop_na(df_short[,c("Price", "Property.Type", "Room.Type" , "Accommodate
 
 ```
 
-All these characteristics except Listing.Description.Length are tightly associated with the price.
+All these characteristics except fo Bed.Type have some correlation with the price.
 
 ```{r}
-df_short |> select(-c(Listing.Description.Length)) -> df_short
+df_short |> select(-c(Bed.Type)) -> df_short
 ```
 
 **Conditions**
@@ -223,7 +207,11 @@ ggpairs(df_short[,c("Price", "Security.Deposit", "Cleaning.Fee", "Guests.Include
 
 ```
 
-All these features could be important.
+All these features except for Minimum.Nights could be important.
+
+```{r}
+df_short |> select(-c(Minimum.Nights)) -> df_short
+```
 
 **Amenities**
 
@@ -247,7 +235,7 @@ ggpairs(df_short[,c('Price', "Heating", "Washer", "Essentials", "Shampoo", "Air.
 
 ```
 
-Except for Breakfast, Washer, Family.kid.friendly, Dryer, Hair.dryer and Iron these amenites could be important.
+Except for Breakfast, Washer, Family.kid.friendly, Dryer, Hair.dryer and Iron these amenities could be important.
 
 ```{r}
 df_short |> select(-c(Breakfast,Washer, Family.kid.friendly, Dryer, Hair.dryer, Iron)) -> df_short
@@ -313,13 +301,7 @@ summary(df_short.test)
 ```{r}
 model <- lm(data=df_short.train, formula=Price~ .)
 
-summary(model)
-
 ```
-
-The R-squared is not great with all these features. Let's try to take some irrelevant of highly correlated features out of the equation.
-
-After trying several combinations, it seems that the model doesn't perform better with less features. The original model will be used.
 
 ```{r}
 df_short.train$Price_est <- predict(model,df_short.train)
@@ -331,11 +313,7 @@ df_short.test$Price_est <- predict(model,df_short.test)
 caret::postResample(pred=df_short.test$Price_est, obs= df_short.test$Price)
 ```
 
-The RMSE and Rsquared are similar for train and test, meaning that the model is not under- or overfitting.
-
-## Adjusting the model
-
-However, the performance is far from optimal, so let's check the residual errors.
+With R-squared of 0.64 and 30 as residual standard error, the performance is far from optimal, so let's check the **residual errors.**
 
 ```{r}
 ggplot(df_short.test, aes(x=Price, y=Price-Price_est))+
@@ -343,62 +321,32 @@ ggplot(df_short.test, aes(x=Price, y=Price-Price_est))+
   geom_hline(yintercept = 0, color='#dea82a', linewidth=1)
 ```
 
-The model fails most with Price range outliers. Probably, by better managing the outliers, we could obtain a better result.
+The residual errors tend to get bigger with higher values. One possible cause of poor performance of the model could be the **skewness of the data** that we have observed earlier.
+
+### Logarithmic and Square root Transformations in order to eliminate the skeweness of the data
+
+-   Log of Price instead of Price
+-   Log of Number of Reviews instead of Number of Reviews
+-   log(x+1) for Security Deposit and Cleaning Fee because they have 0 values after imputation
+-   Square root for medium-performing Reviews.Score variables
+-   Drop features with feeble correlation
 
 ```{r}
-ggplot(df_short, aes(x=Price)) + geom_boxplot(color=	'#275136')
-```
+model_log <- lm(data=df_short.train, formula=I(log10(Price))~ .-Number.of.Reviews+I(log(Number.of.Reviews))-Security.Deposit+I(log(Security.Deposit+1))-Review.Scores.Cleanliness+sqrt(Review.Scores.Cleanliness)-Review.Scores.Location+sqrt(Review.Scores.Location)-Review.Scores.Accuracy+sqrt(Review.Scores.Accuracy)-Review.Scores.Checkin-Host.Identity.Verified-Essentials)
 
-```{r}
-iqr = quantile(df_short$Price, 0.75) - quantile(df_short$Price, 0.25)
-upper_limit = quantile(df_short$Price, 0.75) + iqr*1.5
-print(upper_limit)
 
-```
-
-```{r}
-df_short |>
-  mutate(Price=ifelse(Price>150, 150, Price)) -> df_new
-```
-
-```{r}
-ggplot(df_new, aes(x=Price)) + geom_boxplot(color=	'#275136')
-```
-
-### New model
-
-```{r}
-set.seed(7)
-itrain <- sample(1:nrow(df_new),round(nrow(df_new)*0.7))
-
-df.train <- df_new[itrain,]
-df.test <- df_new[-itrain,]
-
-print("Training subset:")
-summary(df.train)
-print("Test subset:")
-summary(df.test)
-```
-
-```{r}
-new_model <- lm(data=df.train, formula=Price~ .)
+summary(model_log)
 
 ```
 
 ```{r}
-df.train$Price_est <- predict(model,df.train)
-caret::postResample(pred=df.train$Price_est, obs= df.train$Price)
+df_short.train$Price_est <- predict(model_log,df_short.train)
+caret::postResample(pred=df_short.train$Price_est, obs= I(log10(df_short.train$Price)))
 ```
 
 ```{r}
-df.test$Price_est <- predict(model,df.test)
-caret::postResample(pred=df.test$Price_est, obs= df.test$Price)
+df_short.test$Price_est <- predict(model_log,df_short.test)
+caret::postResample(pred=df_short.test$Price_est, obs= I(log(df_short.test$Price)))
 ```
 
-The RMSE and Rsquared are better than before trimming the upper outliers. Both values are similar for train and test, meaning that the model is not under- or overfitting.
-
-```{r}
-ggplot(df.test, aes(x=Price, y=Price-Price_est))+
-  geom_point(color='#2a90de', alpha=0.7)+ggtitle("Residuals")+
-  geom_hline(yintercept = 0, color='#dea82a', linewidth=1)
-```
+**The Rsquared for both train and test subsets is around 0.77-0.78 which is acceptable. The fact that they are similar shows that the the model isn't overfitting.**
