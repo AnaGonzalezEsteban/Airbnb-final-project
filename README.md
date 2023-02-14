@@ -28,7 +28,7 @@
 --------------------------------
 ## 1. Project object
 
-The purpose of this project is to analyze which features an airbnb accommodation must have to be one of the most rented in Madrid.
+The purpose of this project is to analyze what features must an Airbnb accommodation have and what ammenities must offer it to be one of the most demanded in Madrid.
 
 
 --------------------------------
@@ -329,10 +329,17 @@ After these changes, the Rsquared for both train and test subsets were around 0.
 --------------------------------
 ## 10. Conclusion
 
-● Suposiciones iniciales. Cuales han demostrado ser válidas y cuáles no. ¿Por qué?
-● Métricas seleccionadas: ¿han sido las correctas o no? ¿por qué?
-● Teniendo en cuenta lo aprendido ¿Qué cosas se harían igual y cuales se harían de otra forma? ¿Por qué?
-● Conclusiones y “lessons learned”
+● Initial assumptions. Which have been shown to be valid, which have not and why?
+
+From the beginning we assumed that location, property type and bedroom type would influence the price, which has turned out to be correct. On the other hand, we thought that there would be more amenities and features that would also have an influence on the price, and we have not been able to find a relationship that demonstrates it.
+
+We also assumed that the success of an accommodation was directly related to the price, although that may not be the case.
+
+● Taking into account what has been learned, what would be done in the same way and what would be done in another way?
+
+Instead of assuming that success is based on price, we would analyze the success of an accommodation considering availability and also ratings of each listing based on the number of people who rated it.
+
+We would also focus on analyzing a specific feature instead of analyzing them all in general.
 
 
 --------------------------------
