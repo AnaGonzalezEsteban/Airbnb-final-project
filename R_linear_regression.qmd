@@ -1,0 +1,352 @@
+---
+  format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+#read the dataframe from csv file
+df_airbnb <- read.csv('airbnb_ready.csv', encoding="UTF-8", sep=';', stringsAsFactors = T)
+head(df_airbnb)
+
+```
+
+```{r}
+#check the columns
+names(df_airbnb)
+```
+
+Let's have a look at the **distribution of the target variable**.
+
+```{r, fig.width=10, fig.height=5}
+library(ggplot2)
+ggplot(df_airbnb, aes(x=Price)) + geom_boxplot(color='#13b99a')
+```
+
+There are some serious outliers in this column, but given the nature of the dataset and a relatively high number of these outliers, these can be real observations, a lot of these can be real observations.
+
+First, let's **drop columns** that are not likely to be of interest for a linear regression model predicting price or that have too many nulls as per previous EDA in python
+
+```{r}
+#drop columns and save the result in df_short
+
+df_airbnb |> select(-c(X, ID, Name, Zipcode, Weekly.Price, Monthly.Price, Host.Name, Host.ID)) -> df_short
+
+```
+
+The next step would be to **impute the null values** in the float dtype columns Bathrooms, Bedrooms, Beds, Review.Scores.Rating, Review.Scores.Accuracy, Review.Scores.Cleanliness, Review.Scores.Checkin, Review.Scores.Communication, Review.Scores.Location, Review.Scores.Value, Reviews.per.Month and boolean column Madrid.Based **that weren't imputed before visualization in order avoid distorting the analysis.**
+
+**Bathrooms**
+
+```{r}
+#impute null values with median
+df_short |> mutate(Bathrooms = ifelse(is.na(Bathrooms), median(df_short$Bathrooms, na.rm = T), Bathrooms)) -> df_short
+any(is.na(df_short$Bathrooms))
+
+```
+
+```{r}
+ggplot(df_short, aes(x=Bathrooms)) + geom_bar(fill='#9e597f')
+```
+
+There aren't any null values left in Bathrooms column, but having 0 values for number of bathrooms can be weird. Let's check if it is related with Room.Type and Price and might actually mean 0.5 bathrooms (a small bathroom without shower or tub).
+
+```{r}
+ggplot(df_short, aes(x=Room.Type, y=Bathrooms)) + geom_boxplot(color=	'#59769e')
+
+```
+
+```{r}
+ggplot(df_short, aes(x=Price, y=Bathrooms)) + geom_point(color=	'#59769e')
+
+```
+
+These 0 values don't seem to depend on the Room.Type and in terms of price are similar to 0.5 bathroom listings. We can safely impute them with 0.5.
+
+```{r}
+#impute 0 values with 0.5
+df_short |>
+  mutate(Bathrooms=ifelse(Bathrooms==0, 0.5, Bathrooms)) -> df_short
+```
+
+**Bedrooms**
+
+```{r}
+#impute null values with median
+df_short |> mutate(Bedrooms = ifelse(is.na(Bedrooms), median(df_short$Bedrooms, na.rm = T), Bedrooms)) -> df_short
+any(is.na(df_short$Bedrooms))
+
+```
+
+```{r}
+ggplot(df_short, aes(x=Bedrooms)) + geom_bar(fill='#599e76')
+```
+
+There are no null values left, and 0 Bedrooms could mean a studio.
+
+**Beds**
+
+```{r}
+#impute null values with median
+df_short |> mutate(Beds = ifelse(is.na(Beds), median(df_short$Beds, na.rm = T), Beds)) -> df_short
+any(is.na(df_short$Beds))
+```
+
+**Review.Scores**
+
+In case of reviews null values most likely correspond to properties with no reviews so far.
+
+```{r}
+#impute null values with zeros
+df_short |> mutate(Reviews.per.Month = ifelse(is.na(Reviews.per.Month), 0, Reviews.per.Month)) -> df_short
+any(is.na(df_short$Reviews.per.Month))
+```
+
+Speaking about Review.Score, it is difficult to impute missing reviews without distorting the data, so I will just drop these observations.
+
+```{r}
+#drop observations with nulls in Review data
+df_short |> drop_na() -> df_short
+```
+
+```{r}
+any(is.na(df_short))
+```
+
+**Madrid Based** Values in Madrid.Based column are not exactly null, so the label can be just adjusted to 'No Data', 'False' and 'True.
+
+```{r}
+#check unique values
+ggplot(df_short, aes(x=Madrid.Based, fill=Madrid.Based)) + geom_bar()
+```
+
+```{r}
+#impute null values with 'No Data'
+
+df_short$Madrid.Based <- factor(df_short$Madrid.Based, labels = c('No Data', 'False', 'True'))
+
+```
+
+```{r}
+ggplot(df_short, aes(x=Madrid.Based, fill=Madrid.Based)) + geom_bar()
+```
+
+Let's **check the association of different features of this dataset with the price.**
+
+Given that there are about 90 features, we will explore them *by thematic groups.*
+
+**Location**
+
+```{r, fig.width=15, fig.height=10}
+#check what Location columns could be make good features for a lineal regression model predicting price
+library(GGally)
+ggpairs(df_short[,c('Price', 'Latitude', 'Longitude', 'Neighbourhood.Group.Cleansed', 'Neighbourhood.Cleansed')], cardinality_threshold=125, progress=F, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3,color='#3c9393'))
+)  
+```
+
+Longitude and Latitude don't have very significant correlation with the Price and but can be informative. Neighbourhood.Cleansed and Neighbourhood.Group.Cleansed are rather similar and one should be dropped in order to **avoid using highly correlated independent variables.**
+
+```{r}
+df_short |> select(-c(Neighbourhood.Cleansed)) -> df_short
+
+```
+
+**Availability**
+
+```{r}
+#check what Availability columns could be make good features for a lineal regression model predicting price
+
+cor(df_short[,c('Price', 'Availability.30.Perc', 'Availability.60.Perc', 'Availability.90.Perc', 'Availability.365.Perc')])
+
+```
+
+The Availability for 60 and 90 days seems to have very little correlation with the price.
+
+```{r}
+df_short |> select(-c(Availability.60.Perc, Availability.90.Perc)) -> df_short
+
+```
+
+**Review**
+
+```{r, fig.width=15, fig.height=15}
+#check what Review columns could be of interest
+df_reviews = df_short[,c('Price', 'Reviews.per.Month', 'Number.of.Reviews', 'Review.Scores.Rating', 'Review.Scores.Accuracy', 'Review.Scores.Cleanliness', 'Review.Scores.Checkin', 'Review.Scores.Communication', 'Review.Scores.Location', 'Review.Scores.Value')]
+
+ggpairs(df_reviews,cardinality_threshold =22, progress=F, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3,color='#9072bf'))
+)
+
+```
+
+The correlation of Review Scores with Price is not very high but they still could be informative for the model. However, it might be useful to keep in mind that **the distribution of all these variables is left skewed**.
+
+**Type of property and its general characteristics**
+
+```{r, fig.width=15, fig.height=15}
+#check what Property characteristics columns could be make good features for a lineal regression model predicting price
+ggpairs(drop_na(df_short[,c("Price", "Property.Type", "Room.Type" , "Accommodates", "Bathrooms", "Bedrooms", "Beds", "Bed.Type", "Listing.Description.Length")]),cardinality_threshold =22, progress=F, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3,color='#496473'))
+)
+
+```
+
+All these characteristics except fo Bed.Type have some correlation with the price.
+
+```{r}
+df_short |> select(-c(Bed.Type)) -> df_short
+```
+
+**Conditions**
+
+```{r, fig.width=15, fig.height=15}
+#check what Property Features could be make good features for a lineal regression model predicting price
+ggpairs(df_short[,c("Price", "Security.Deposit", "Cleaning.Fee", "Guests.Included", "Extra.People", "Minimum.Nights","Maximum.Nights", "Cancellation.Policy" )],cardinality_threshold =22, progress=F, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3,color='#91a3d2'))
+)
+
+```
+
+All these features except for Minimum.Nights could be important.
+
+```{r}
+df_short |> select(-c(Minimum.Nights)) -> df_short
+```
+
+**Amenities**
+
+```{r, fig.width=15, fig.height=15}
+#check what Property Features could be make good features for a lineal regression model predicting price
+ggpairs(df_short[,c('Price', 'TV', 'Internet', 'Kitchen', 'Doorman','Elevator.in.building','Buzzer.wireless.intercom')],cardinality_threshold =22, progress=F, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3,color='#bf620b'))
+)
+
+```
+
+Except for the Internet and Buzzer.wireless.intercom these features might be relevant.
+
+```{r}
+df_short |> select(-c(Internet, Buzzer.wireless.intercom)) -> df_short
+```
+
+```{r, fig.width=15, fig.height=15}
+#check what Property Features could be make good features for a lineal regression model predicting price
+ggpairs(df_short[,c('Price', "Heating", "Washer", "Essentials", "Shampoo", "Air.conditioning", "Breakfast", "Family.kid.friendly", "Dryer", "Hair.dryer", "Iron" )],cardinality_threshold =22, progress=F, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3))
+)
+
+```
+
+Except for Breakfast, Washer, Family.kid.friendly, Dryer, Hair.dryer and Iron these amenities could be important.
+
+```{r}
+df_short |> select(-c(Breakfast,Washer, Family.kid.friendly, Dryer, Hair.dryer, Iron)) -> df_short
+```
+
+```{r, fig.width=15, fig.height=15}
+#check what Property Features could be make good features for a lineal regression model predicting price
+ggpairs(df_short[,c('Price', "Laptop.friendly.workspace", "Pets.allowed", "Smoke.detector", "Carbon.monoxide.detector", "First.aid.kit", "Fire.extinguisher","X24.hour.check.in", "Smoking.allowed", "Wheelchair.accessible", "Is.Location.Exact", "Instant.Bookable")],cardinality_threshold =22, progress=FALSE, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3,color='red'))
+)
+```
+
+Except for Laptop.friendly.workspace, Fire.extinguisher, Smoke.detector, Carbon.monoxide.detector and X24.hour.check.in these amenities might be important.
+
+```{r}
+df_short |> select(-c(Laptop.friendly.workspace, Fire.extinguisher, Smoke.detector,  Carbon.monoxide.detector, X24.hour.check.in)) -> df_short
+```
+
+**Host**
+
+```{r}
+#take only the number of days from Host.Tenure column
+
+df_short$Host.Tenure <-  strtoi(regmatches(df_short$Host.Tenure, regexpr('^[0-9]*',df_short$Host.Tenure)))
+```
+
+```{r, fig.width=15, fig.height=15}
+#check what Host-related characteristics could be make good features for a lineal regression model predicting price
+ggpairs(df_short[,c('Price', "House.Rules", "Host.About", "Host.Response.Time", "Host.Response.Rate", "Host.Listings.Count","Host.Identity.Verified", "Host.Is.Superhost", "Days.from.Cal.Update", "N.of.Host.Verifications", "Madrid.Based")],cardinality_threshold =22, progress=FALSE, lower = list(continuous = wrap("points", alpha = 0.3,size=0.3, color='#5076a2'))
+)
+```
+
+Features with interesting correlation with the price seem to be Host.Listings.Count, Host.Identity.Verified, Host.Tenure, Host.Is.Superhost, Host.Response.Time, Days.from.Cal.Update, N.of.Host.Verifications.
+
+```{r}
+df_short |> select(-c(Host.Response.Rate, Madrid.Based, Host.About, House.Rules)) -> df_short
+```
+
+Resulting Columns:
+
+```{r}
+names(df_short)
+```
+
+## Linear Regression Model
+
+**Division of the dataset in train and test**
+
+```{r}
+set.seed(7)
+itrain <- sample(1:nrow(df_short),round(nrow(df_short)*0.7))
+
+df_short.train <- df_short[itrain,]
+df_short.test <- df_short[-itrain,]
+
+print("Training subset:")
+summary(df_short.train)
+print("Test subset:")
+summary(df_short.test)
+```
+
+**Creation of the model**
+
+```{r}
+model <- lm(data=df_short.train, formula=Price~ .)
+
+```
+
+```{r}
+df_short.train$Price_est <- predict(model,df_short.train)
+caret::postResample(pred=df_short.train$Price_est, obs= df_short.train$Price)
+```
+
+```{r}
+df_short.test$Price_est <- predict(model,df_short.test)
+caret::postResample(pred=df_short.test$Price_est, obs= df_short.test$Price)
+```
+
+With R-squared of 0.64 and 30 as residual standard error, the performance is far from optimal, so let's check the **residual errors.**
+
+```{r}
+ggplot(df_short.test, aes(x=Price, y=Price-Price_est))+
+  geom_point(color='#2a90de', alpha=0.7)+ggtitle("Residuals")+
+  geom_hline(yintercept = 0, color='#dea82a', linewidth=1)
+```
+
+The residual errors tend to get bigger with higher values. One possible cause of poor performance of the model could be the **skewness of the data** that we have observed earlier.
+
+### Logarithmic and Square root Transformations in order to eliminate the skeweness of the data
+
+-   Log of Price instead of Price
+-   Log of Number of Reviews instead of Number of Reviews
+-   log(x+1) for Security Deposit and Cleaning Fee because they have 0 values after imputation
+-   Square root for medium-performing Reviews.Score variables
+-   Drop features with feeble correlation
+
+```{r}
+model_log <- lm(data=df_short.train, formula=I(log10(Price))~ .-Number.of.Reviews+I(log(Number.of.Reviews))-Security.Deposit+I(log(Security.Deposit+1))-Review.Scores.Cleanliness+sqrt(Review.Scores.Cleanliness)-Review.Scores.Location+sqrt(Review.Scores.Location)-Review.Scores.Accuracy+sqrt(Review.Scores.Accuracy)-Review.Scores.Checkin-Host.Identity.Verified-Essentials)
+
+
+summary(model_log)
+
+```
+
+```{r}
+df_short.train$Price_est <- predict(model_log,df_short.train)
+caret::postResample(pred=df_short.train$Price_est, obs= I(log10(df_short.train$Price)))
+```
+
+```{r}
+df_short.test$Price_est <- predict(model_log,df_short.test)
+caret::postResample(pred=df_short.test$Price_est, obs= I(log(df_short.test$Price)))
+```
+
+**The Rsquared for both train and test subsets is around 0.77-0.78 which is acceptable. The fact that they are similar shows that the the model isn't overfitting.**
