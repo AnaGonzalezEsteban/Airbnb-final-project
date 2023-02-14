@@ -1,4 +1,4 @@
-# The key to the success of an airbnb listing
+# The key to the success of an Airbnb accommodation
 
 1. Project object
 
