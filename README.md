@@ -329,7 +329,7 @@ After these changes, the Rsquared for both train and test subsets were around 0.
 --------------------------------
 ## 10. Conclusion
 
-● Initial assumptions. Which have been shown to be valid, which have not and why?
+● Initial assumptions: which have been shown to be valid, which have not and why?
 
 From the beginning we assumed that location, property type and bedroom type would influence the price, which has turned out to be correct. On the other hand, we thought that there would be more amenities and features that would also have an influence on the price, and we have not been able to find a relationship that demonstrates it.
 
