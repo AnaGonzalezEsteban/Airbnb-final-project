@@ -50,7 +50,7 @@ The tools used to carry out this project are the following:
 
 ### You can see the initial information used for this analysis in the following Airbnb dataset: [airbnb-listings.csv](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/airbnb-listings.csv)
 
-### Also we used the information we found in the website that provides the initial dataset about its content in this file: [Inside Airbnb Data Dictionary.xlsx](https://github.com/AnaGonzalezEsteban/Airbnb-final-project/blob/main/Inside%20Airbnb%20Data%20Dictionary.xlsx) 
+### We also used the information about the content of the previous Airbnb's dataset in the Data Dictionary you will find here: http://insideairbnb.com/explore/
 
 
 --------------------------------
