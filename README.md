@@ -22,7 +22,7 @@
 
 11. Project editors
 
-12. Thanks to
+12. Thanks
 
 
 --------------------------------
