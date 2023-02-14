@@ -27,7 +27,6 @@ We are going to create a function that tells us how many repeated values are the
 ```{r}
 # cols returns a dataframe that summarizes: the column name, the number of unique values, the empty/false or na values, and the repeated values in each column. 
 
-source("functions.R")
 cols <- function(df){
   #initialize summary columns
   nc <- ncol(df)
@@ -129,7 +128,9 @@ detail <- airbnb_clean[airbnb_clean$Country!="Spain", ]
 
 We can check that most of the information about the apartment in "Cuba" talks about La Habana. The geolocation might be wrong, so we cant probably trust this data point. The listing from Italy seems to be an italian girl looking for an apartment.
 
-\``{r} detail <- airbnb_clean |>   filter(!(grepl("Madrid|马德里|馬德里自治區", City, ignore.case = TRUE) | grepl("28...", Zipcode)))`
+```{r} 
+detail <- airbnb_clean |>   filter(!(grepl("Madrid|马德里|馬德里自治區", City, ignore.case = TRUE) | grepl("28...", Zipcode)))
+```
 
 Something similar happens if we check the apartments that don't mention Madrid as the State, and have a Zipcode that doesn't start with 28. Some apartments have addresses located in Barcelona, Malaga or Valencia, 4 of them don't have any information about their city, Street State or Zipcode. These could be mistakes in the Geolocation data. They only add up to 11 data points, so we can safely remove them.
 
@@ -154,7 +155,8 @@ airbnb_clean$State <- "Comunidad de Madrid"
 airbnb_cols <- cols(airbnb_clean)
 ```
 
-####Neighbourhood There seems to be a difference between Neighbourhood and Neighbouhood.Cleansed. Let's visualize that:
+####Neighbourhood 
+There seems to be a difference between Neighbourhood and Neighbouhood.Cleansed. Let's visualize that:
 
 ```{r}
 madrid_ab <- airbnb_clean |>
@@ -328,7 +330,7 @@ airbnb_clean <- airbnb_clean |>
 ```{r}
 airbnb_cols <- cols(airbnb_clean)
 
-write.csv(airbnb_clean, "airbnb_clean.csv", sep = ";", row.names = FALSE)
+write.csv2(airbnb_clean, "airbnb_clean.csv", row.names = FALSE)
 ```
 
 ## Data entities:
@@ -344,7 +346,7 @@ hosts <- airbnb_clean |>
 
 hosts_cols <- cols(hosts)
 
-write_csv(hosts, "hosts.csv")
+write.csv2(hosts, "hosts.csv", row.names = FALSE)
 
 ```
 
